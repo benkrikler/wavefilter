@@ -1,8 +1,10 @@
-import numpy as np
 from dataclasses import dataclass
-from .pulse_functions import simple
-from typing import Callable, List, Tuple, Any
+from typing import Any, Callable, List, Tuple
+
+import numpy as np
 from scipy.ndimage import convolve1d
+
+from .pulse_functions import simple
 
 
 @dataclass
@@ -15,8 +17,8 @@ class ToyData:
     max_truth_pulses: int = 10
 
     def __call__(self, n_samples: int) -> Tuple[Any, Tuple[Any, Any]]:
-        pulse_length = 10 * self.shape
-        padded_length = self.length + 2* (pulse_length - 1)
+        pulse_length = int(10 * self.shape)
+        padded_length = self.length + 2 * (pulse_length - 1)
         t0 = pulse_length - 1
 
         data_dims = (n_samples, padded_length)
@@ -42,7 +44,7 @@ class ToyData:
         # Convolve with pulse shape
         pulse = simple(np.arange(pulse_length), self.shape)
         pulse /= pulse.max()
-        y = convolve1d(y, pulse, origin=1 - pulse_length//2)
+        y = convolve1d(y, pulse, origin=1 - pulse_length // 2)
 
         # Add output noise
         y += np.random.normal(scale=self.out_noise, size=data_dims)
@@ -62,7 +64,7 @@ class DoublePulses:
     a_low: float = 0
     a_high: float = 100
 
-    def __call__(self, n_samples: int ) -> List[Tuple[int,float]]:
+    def __call__(self, n_samples: int) -> List[Tuple[int, float]]:
         t1 = np.random.normal(self.t1_mean, self.t1_std, size=n_samples).astype(int)
         t2 = t1 + np.random.randint(self.dt2_low, self.dt2_high, size=n_samples, dtype=int)
         a1, a2 = np.random.uniform(self.a_low, self.a_high, size=(2, n_samples))
@@ -70,11 +72,22 @@ class DoublePulses:
 
 
 def generate_double_pulse_dataset(
-        n_samples,
-        t1_mean = 100, t1_std=10, dt2_low=60, dt2_high=150, a_low = 10, a_high=150,
-        length=1000, shape=30, in_noise=1.5, out_noise=3):
+    n_samples: int,
+    t1_mean: float = 100,
+    t1_std: float = 10,
+    dt2_low: float = 60,
+    dt2_high: float = 150,
+    a_low: float = 10,
+    a_high: float = 150,
+    length: int = 1000,
+    shape: float = 30,
+    in_noise: float = 1.5,
+    out_noise: float = 3,
+) -> Tuple[Any, Tuple[Any, Any]]:
 
-    generator = DoublePulses(t1_mean=t1_mean, t1_std=t1_std, dt2_low=dt2_low, dt2_high=dt2_high, a_low=a_low, a_high=a_high)
+    generator = DoublePulses(
+        t1_mean=t1_mean, t1_std=t1_std, dt2_low=dt2_low, dt2_high=dt2_high, a_low=a_low, a_high=a_high
+    )
     builder = ToyData(length=length, shape=shape, in_noise=in_noise, out_noise=out_noise, generator=generator)
     data, truth = builder(n_samples)
     return data, truth
