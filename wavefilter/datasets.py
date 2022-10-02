@@ -1,7 +1,8 @@
 from dataclasses import dataclass
-from typing import Any, Callable, List, Tuple
+from typing import Callable, List, Tuple
 
 import numpy as np
+import numpy.typing as npt
 from scipy.ndimage import convolve1d
 
 from .pulse_functions import simple
@@ -16,7 +17,7 @@ class ToyData:
     generator: Callable[[int], List[Tuple[int, float]]]
     max_truth_pulses: int = 10
 
-    def __call__(self, n_samples: int) -> Tuple[Any, Tuple[Any, Any]]:
+    def __call__(self, n_samples: int) -> Tuple[npt.NDArray[float], Tuple[npt.NDArray[float], npt.NDArray[int]]]:
         pulse_length = int(10 * self.shape)
         padded_length = self.length + 2 * (pulse_length - 1)
         t0 = pulse_length - 1
@@ -83,7 +84,7 @@ def generate_double_pulse_dataset(
     shape: float = 30,
     in_noise: float = 1.5,
     out_noise: float = 3,
-) -> Tuple[Any, Tuple[Any, Any]]:
+) -> Tuple[npt.NDArray[float], Tuple[npt.NDArray[float], npt.NDArray[int]]]:
 
     generator = DoublePulses(
         t1_mean=t1_mean, t1_std=t1_std, dt2_low=dt2_low, dt2_high=dt2_high, a_low=a_low, a_high=a_high

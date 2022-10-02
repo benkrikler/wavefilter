@@ -1,5 +1,6 @@
 from wavefilter import datasets
 
+
 def test_generate_double_pulse_dataset():
     n_samples = 100
     data, truth = datasets.generate_double_pulse_dataset(n_samples, 30)
