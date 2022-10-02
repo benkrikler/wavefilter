@@ -54,3 +54,5 @@ python -m pytest
 ## License
 
 `wavefilter` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+
+*Based on python package template from https://github.com/benkrikler/my_python_cookie*
