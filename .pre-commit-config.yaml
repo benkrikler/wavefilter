@@ -62,7 +62,6 @@ repos:
     hooks:
       - id: mypy
         files: wavefilter
-        args: []
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.1.0
