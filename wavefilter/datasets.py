@@ -3,6 +3,7 @@ from typing import Callable, List, Tuple
 
 import numpy as np
 import numpy.typing as npt
+import pandas as pd
 from scipy.ndimage import convolve1d
 
 from .pulse_functions import simple
@@ -72,6 +73,16 @@ class DoublePulses:
         return [(t1, a1), (t2, a2)]
 
 
+def to_pandas(
+    data: npt.NDArray[float], truth_amps: npt.NDArray[float], truth_time: npt.NDArray[int], save: str = ""
+) -> pd.DataFrame:
+    dfs = [pd.DataFrame(i) for i in [data, truth_amps, truth_time]]
+    df = pd.concat(dfs, keys=["data", "truth_amplitude", "truth_time"], axis=1)
+    if save:
+        df.to_pickle(save)
+    return df
+
+
 def generate_double_pulse_dataset(
     n_samples: int,
     t1_mean: float = 100,
@@ -92,3 +103,34 @@ def generate_double_pulse_dataset(
     builder = ToyData(length=length, shape=shape, in_noise=in_noise, out_noise=out_noise, generator=generator)
     data, truth = builder(n_samples)
     return data, truth
+
+
+if __name__ == "__main__":
+    import argparse
+    import logging
+
+    logging.basicConfig(level=logging.INFO)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--n_samples", type=int, required=True)
+    parser.add_argument("--t1_mean", type=float, default=100)
+    parser.add_argument("--t1_std", type=float, default=10)
+    parser.add_argument("--dt2_low", type=float, default=100)
+    parser.add_argument("--dt2_high", type=float, default=700)
+    parser.add_argument("--a_low", type=float, default=10)
+    parser.add_argument("--a_high", type=float, default=150)
+    parser.add_argument("--length", type=int, default=1000)
+    parser.add_argument("--shape", type=float, default=40)
+    parser.add_argument("--in_noise", type=float, default=0.65)
+    parser.add_argument("--out_noise", type=float, default=3)
+    parser.add_argument(
+        "--save", type=str, default="data_double_pulse-n_{n_samples}-in_{in_noise}-out_{out_noise}-shape_{shape}.pkl.gz"
+    )
+    args = vars(parser.parse_args())
+
+    save = args.pop("save")
+    save = save.format(**args)
+
+    data, truth = generate_double_pulse_dataset(**args)
+    to_pandas(data, *truth, save=save)
+    logging.info(f"Wrote data to '{save}'")
