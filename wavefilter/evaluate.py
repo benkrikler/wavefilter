@@ -105,14 +105,14 @@ def split_parameters(model: nn.Module, groups: List[str]) -> ParamGroups:
     """
     split_parameters(model, ["attend"])
     """
-    parameters: ParamGroups = [dict(parameters=[]) for _ in range(len(groups) + 1)]
+    parameters: ParamGroups = [dict(params=[]) for _ in range(len(groups) + 1)]
     for name, param in model.named_parameters():
         for i, group in enumerate(groups):
             if name.startswith(group):
-                parameters[i]["parameters"].append(param)
+                parameters[i]["params"].append(param)
                 break
         else:
-            parameters[-1]["parameters"].append(param)
+            parameters[-1]["params"].append(param)
     return parameters
 
 
