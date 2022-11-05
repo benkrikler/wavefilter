@@ -62,7 +62,7 @@ repos:
     hooks:
       - id: mypy
         files: wavefilter
-        additional_dependencies: [torch==1.12]
+        additional_dependencies: [torch>=1.12]
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.1.0
