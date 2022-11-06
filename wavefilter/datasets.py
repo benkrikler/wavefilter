@@ -1,9 +1,10 @@
 from dataclasses import dataclass
-from typing import Callable, List, Tuple
+from typing import Any, Callable, List, Tuple
 
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
+import torch
 from scipy.ndimage import convolve1d
 
 from .pulse_functions import simple
@@ -81,6 +82,12 @@ def to_pandas(
     if save:
         df.to_pickle(save)
     return df
+
+
+def to_dataloader(data: npt.NDArray[float], **kwargs: Any) -> Any:
+    # TODO: use better type annotations than Any
+    ds = torch.utils.data.TensorDataset(data)
+    return torch.utils.data.DataLoader(ds, **kwargs)
 
 
 def generate_double_pulse_dataset(
