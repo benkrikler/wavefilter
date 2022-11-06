@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Callable, List, Tuple
+from typing import Callable, List, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -84,13 +84,12 @@ def to_pandas(
     return df
 
 
-# TODO: use better type annotations than Any
-def to_dataloader(data: npt.NDArray[float], **kwargs: Any) -> Any:
+def to_torch_dataset(data: npt.NDArray[float]) -> torch.utils.data.TensorDataset:
     # Add an extra dimension for the channel number
     data = data[:, np.newaxis, :]
     data = torch.tensor(data)
     ds = torch.utils.data.TensorDataset(data)
-    return torch.utils.data.DataLoader(ds, **kwargs)
+    return ds
 
 
 def generate_double_pulse_dataset(
