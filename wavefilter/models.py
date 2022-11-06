@@ -10,7 +10,7 @@ class GlobalSoftMaxAttention(nn.Module):
         return F.softmax(ampl, -1)
 
 
-class Conv1dPulseFinderAttention(nn.Module):
+class Conv1dPulseFinderAttentionBase(nn.Module):
     def __init__(self, length: int, use_amplitude: bool = True):
         super().__init__()
         self.use_amplitude = use_amplitude
@@ -19,41 +19,46 @@ class Conv1dPulseFinderAttention(nn.Module):
         self.combine = nn.Conv1d(n_channels, 1, 5, padding="same")
         self.scale = nn.Conv1d(1, 1, 1, padding="same")
 
-    def forward(self, ampl: torch.Tensor, original: torch.Tensor) -> Any:
+    def forward_step1(self, ampl: torch.Tensor, original: torch.Tensor) -> Any:
         # Should be returning `torch.Tensor`:
         pf = self.pulse_finder(original)
         inputs: Tuple[torch.Tensor, ...] = (original, pf)
         if self.use_amplitude:
             inputs += (ampl,)
         concat = torch.concat(inputs, dim=-2)
-        encoded = self.combine(concat)
-        encoded = F.leaky_relu(encoded)
-        # encoded = torch.tanh(encoded)
-        encoded = self.scale(encoded)
-        # encoded = f.softmax(encoded, -1)
-        encoded = torch.sigmoid(encoded)
-        return encoded
+        return concat
+
+    def forward(self, ampl: torch.Tensor, original: torch.Tensor) -> Any:
+        raise NotImplementedError
 
 
-"""
-    encoded = torch.sigmoid(encoded)
-    #encoded = torch.tanh(encoded)
-    encoded = self.scale(encoded)
-    encoded = f.softmax(encoded, -1)
-    #encoded = torch.sigmoid(encoded)
-    return encoded
-"""
+class Conv1dPulseFinderAttention_v1(Conv1dPulseFinderAttentionBase):
+    def forward(self, ampl: torch.Tensor, original: torch.Tensor) -> Any:
+        inputs = super().forward_step1(ampl, original)
+        attend = F.leaky_relu(inputs)
+        # attend = torch.tanh(attend)
+        attend = self.scale(attend)
+        # attend = F.softmax(attend, -1)
+        attend = torch.sigmoid(attend)
+        return attend
 
-"""
-  def forward(self, ampl, original):
-    pf = self.pulse_finder(original)
-    inputs = (original, pf)
-    if self.use_amplitude:
-      inputs += (ampl,)
-    concat = torch.concat(inputs, dim=-2)
-    encoded = torch.tanh(F.softshrink(self.combine(concat)))
-    return F.softmax(encoded, -1
-"""
+
+class Conv1dPulseFinderAttention_v2(Conv1dPulseFinderAttentionBase):
+    def forward(self, ampl: torch.Tensor, original: torch.Tensor) -> Any:
+        inputs = super().forward_step1(ampl, original)
+        attend = torch.sigmoid(inputs)
+        # attend = torch.tanh(attend)
+        attend = self.scale(attend)
+        attend = F.softmax(attend, -1)
+        # attend = torch.sigmoid(attend)
+        return attend
+
+
+class Conv1dPulseFinderAttention_v3(Conv1dPulseFinderAttentionBase):
+    def forward(self, ampl: torch.Tensor, original: torch.Tensor) -> Any:
+        inputs = super().forward_step1(ampl, original)
+        attend = torch.tanh(F.softshrink(inputs))
+        return F.softmax(attend, -1)
 
 
 class ParallelWeightedModules(nn.Module):
