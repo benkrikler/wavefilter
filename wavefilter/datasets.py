@@ -84,8 +84,11 @@ def to_pandas(
     return df
 
 
+# TODO: use better type annotations than Any
 def to_dataloader(data: npt.NDArray[float], **kwargs: Any) -> Any:
-    # TODO: use better type annotations than Any
+    # Add an extra dimension for the channel number
+    data = data[:, np.newaxis, :]
+    data = torch.tensor(data)
     ds = torch.utils.data.TensorDataset(data)
     return torch.utils.data.DataLoader(ds, **kwargs)
 
