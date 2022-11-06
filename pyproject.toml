@@ -52,7 +52,6 @@ path = "wavefilter/__about__.py"
 dependencies = [
   "pytest",
   "pytest-cov",
-  "tqdm>=4",
   #"umap-learn==0.5",
   "jupyterlab>=3.4.7",
   "scikit-learn>=1.1.2",
