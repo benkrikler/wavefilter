@@ -26,7 +26,7 @@ class Conv1dPulseFinderAttentionBase(nn.Module):
         if self.use_amplitude:
             inputs += (ampl,)
         concat = torch.concat(inputs, dim=-2)
-        return concat
+        return self.combine(concat)
 
     def forward(self, ampl: torch.Tensor, original: torch.Tensor) -> Any:
         raise NotImplementedError
