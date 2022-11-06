@@ -6,6 +6,8 @@ import torch
 from torch import nn
 from tqdm.autonotebook import tqdm
 
+from . import models
+
 
 class CaptureActivations:
     def __init__(self) -> None:
@@ -135,10 +137,13 @@ def train_parallel_pulse_finder(
     # optimiser = torch.optim.Adam(model.parameters(), lr = learning_rate)
     train_test_runner = TrainTester(model, optimiser, device, nn.MSELoss())
 
+    adapt_attention = isinstance(model.attend, models.ParallelWeightedModules)
+
     for epoch in tqdm(range(epochs), desc="Epoch"):
         train_test_runner.train_step(data)
         if (
-            epoch > start_incrementing
+            adapt_attention
+            and epoch > start_incrementing
             and (epoch + 1) % epochs_per_increment == 0
             and model.attend.get_weight(conv_pf_name) < 1
         ):
