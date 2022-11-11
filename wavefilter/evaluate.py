@@ -135,7 +135,7 @@ def train_parallel_pulse_finder(
             model.attend.increment_weight(conv_pf_name, change_per_increment)
             logging.info(epoch, model.attend.module_weights)
         scheduler.step()
-        learning_rates.append(scheduler.get_last_lr)
+        learning_rates.append(scheduler.get_last_lr())
         # train_test_runner.validation_step(val_loader)
     # train_test_runner.test_step(test_loader)
 
