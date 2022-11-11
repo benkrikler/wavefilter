@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 
 import numpy as np
 import torch
@@ -130,7 +130,7 @@ def train_parallel_pulse_finder(
     start_incrementing: int = 40,
     epochs_per_increment: int = 12,
     change_per_increment: float = 0.05,
-) -> TrainTester:
+) -> Tuple[TrainTester, List[Any]]:
 
     optimiser = torch.optim.Adam(param_groups, lr=learning_rate)
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimiser, lr_lambda=lr_schedules)
@@ -138,6 +138,7 @@ def train_parallel_pulse_finder(
     train_test_runner = TrainTester(model, optimiser, device, nn.MSELoss())
 
     adapt_attention = isinstance(model.attend, models.ParallelWeightedModules)
+    learning_rates = []
 
     for epoch in tqdm(range(epochs), desc="Epoch"):
         train_test_runner.train_step(data)
@@ -150,7 +151,8 @@ def train_parallel_pulse_finder(
             model.attend.increment_weight(conv_pf_name, change_per_increment)
             logging.info(epoch, model.attend.module_weights)
         scheduler.step()
+        learning_rates.append(scheduler.get_last_lr)
         # train_test_runner.validation_step(val_loader)
     # train_test_runner.test_step(test_loader)
 
-    return train_test_runner
+    return train_test_runner, learning_rates
