@@ -65,7 +65,7 @@ class InspectActivations:
             plot_line(values, label=label)
         plt.legend()
 
-    def plot_encoded(self, true_amp: npt.NDArray[float], true_time: np.NDarray[int]) -> None:
+    def plot_encoded(self, true_amp: npt.NDArray[float], true_time: npt.NDArray[int]) -> None:
         max_amp = max(true_amp)
         encoded = self.activations["encoded"]
         scale = max_amp / encoded.max()
