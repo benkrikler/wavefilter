@@ -45,25 +45,27 @@ class InspectActivations:
     def inspect(
         self,
         model: torch.nn.Module,
-        data: torch.Tensor,
+        data: Any,
         true_amp: npt.NDArray[float],
         true_time: npt.NDArray[int],
         indices: List[int],
     ) -> None:
-        for i in indices:
-            input = data[i].to(self.device)
+
+        rows = len(indices)
+        _, ax = plt.subplots(rows, 2, gridspec_kw={"width_ratios": [15, 10]}, figsize=(25, rows * 6.5))
+
+        for i, idx in enumerate(indices):
+            input = data[idx][0].to(self.device)
             self.activations["input"] = input.cpu().numpy()
             model(input)
-            _, ax = plt.subplots(1, 2, gridspec_kw={"width_ratios": [15, 10]}, figsize=(25, 6))
-            plt.sca(ax[0])
-            self.plot_prediction()
-            plt.sca(ax[1])
-            self.plot_encoded(true_amp[i], true_time[i])
 
-    def plot_prediction(self) -> None:
-        for label, values in self.activations.items():
-            plot_line(values, label=label)
-        plt.legend()
+            plt.sca(ax[i, 0])
+            for label, values in self.activations.items():
+                plot_line(values, label=label)
+            plt.legend()
+
+            plt.sca(ax[i, 1])
+            self.plot_encoded(true_amp[i], true_time[i])
 
     def plot_encoded(self, true_amp: npt.NDArray[float], true_time: npt.NDArray[int]) -> None:
         max_amp = max(true_amp)
