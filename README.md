@@ -6,9 +6,6 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/wavefilter.svg)](https://pypi.org/project/wavefilter)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/wavefilter.svg)](https://pypi.org/project/wavefilter)
 [![CI](https://github.com/benkrikler/wavefilter/actions/workflows/ci.yml/badge.svg)](https://github.com/benkrikler/wavefilter/actions/workflows/ci.yml)
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 -----
 
