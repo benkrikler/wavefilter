@@ -14,6 +14,7 @@ class Conv1dPulseFinderAttentionBase(nn.Module):
     def __init__(self, length: int, use_amplitude: bool = True):
         super().__init__()
         self.use_amplitude = use_amplitude
+        self.pf_length = length
         self.pulse_finder = nn.Conv1d(1, 1, length, padding="same")
         n_channels = 2 + int(use_amplitude)
         self.combine = nn.Conv1d(n_channels, 1, 5, padding="same")
