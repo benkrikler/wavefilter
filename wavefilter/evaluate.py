@@ -8,23 +8,7 @@ from tqdm.autonotebook import tqdm
 
 from . import models
 
-
-class CaptureActivations:
-    def __init__(self) -> None:
-        self.activations: Dict[str, torch.Tensor] = {}
-
-    def __getitem__(self, name: str) -> torch.Tensor:
-        return self.activations[name]
-
-    def __call__(self, name: str) -> Callable[[Any, Any, Any], Any]:
-        def hook(model: Any, input: Any, output: Any) -> None:
-            self.activations[name] = output.detach()
-
-        return hook
-
-    def register(self, model: Any, *layers: str) -> None:
-        for layer in layers:
-            getattr(model, layer).register_forward_hook(self.__call__(layer))
+logging.basicConfig(level=logging.INFO)
 
 
 # Based on https://medium.com/nerd-for-tech/convolution-neural-network-in-pytorch-81023e7de5b9
