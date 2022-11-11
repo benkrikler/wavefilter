@@ -3,6 +3,9 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/wavefilter.svg)](https://pypi.org/project/wavefilter)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/wavefilter.svg)](https://pypi.org/project/wavefilter)
 [![CI](https://github.com/benkrikler/wavefilter/actions/workflows/ci.yml/badge.svg)](https://github.com/benkrikler/wavefilter/actions/workflows/ci.yml)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 -----
 
@@ -48,8 +51,18 @@ Run the built-in unit tests with `pytest`:
 python -m pytest
 ```
 
-## Contributing
-*TODO: Flesh out this section*
+## Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to contribute.
 
 ## License
 
