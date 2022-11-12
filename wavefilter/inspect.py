@@ -71,7 +71,7 @@ class InspectActivations:
                 if isinstance(compare_truth, str):
                     compare_truth = [compare_truth]
                 plt.sca(ax[i, 1])
-                self.compare_truth(compare_truth, true_amp[i], true_time[i])
+                self.compare_truth(compare_truth, true_amp[idx], true_time[idx])
 
     def compare_truth(self, layers: List[str], true_amp: npt.NDArray[float], true_time: npt.NDArray[int]) -> None:
         max_amp = max(true_amp)
