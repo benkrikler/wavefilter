@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 import torch
 import torch.nn.functional as F
@@ -92,13 +92,13 @@ class ParallelWeightedModules(nn.Module):
         weights = ",".join(f"{k}={v}" for k, v in self.module_weights.items())
         return f"module_weights=({weights})"
 
-    def forward(self, ampl: torch.Tensor, original: torch.Tensor) -> Any:
+    def forward(self, *args: Any, **kwargs: Any) -> Union[torch.Tensor, float]:
         results: List[torch.Tensor] = []
         total_weights = 0.0
         for name, module in self.named_children():
             weight = self.module_weights[name]
             total_weights += weight
-            result = weight * module(ampl, original)
+            result = weight * module(*args, **kwargs)
             results.append(result)
         return sum(results) / total_weights
 

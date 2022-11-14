@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,6 +7,8 @@ import torch
 
 
 def plot_line(data: npt.NDArray[float], label: str, **kwargs: Any) -> None:
+    if len(data.shape) > 1:
+        data = data[0]
     scale = max(data.max(), -data.min())
     lines = plt.plot(data / scale, label=f"{label} ($\\times${scale:.01})", **kwargs)
     x = np.random.randint(len(data))
@@ -18,7 +20,7 @@ def plot_line(data: npt.NDArray[float], label: str, **kwargs: Any) -> None:
         xycoords="data",
         textcoords="offset points",
         xytext=(20, 20),
-        arrowprops=dict(width=1, color=color),
+        arrowprops=dict(width=2, color=color),
         color=color,
         rotation=45,
     )
@@ -45,36 +47,38 @@ class InspectActivations:
     def inspect(
         self,
         model: torch.nn.Module,
-        data: torch.Tensor,
+        data: Any,
         true_amp: npt.NDArray[float],
         true_time: npt.NDArray[int],
         indices: List[int],
+        compare_truth: Union[List[str], str] = "",
     ) -> None:
-        for i in indices:
-            input = data[i].to(self.device)
+
+        rows = len(indices)
+        fig, ax = plt.subplots(rows, 2, gridspec_kw={"width_ratios": [15, 10]}, figsize=(25, rows * 6.5))
+
+        for i, idx in enumerate(indices):
+            input = data[idx][0].to(self.device)
             self.activations["input"] = input.cpu().numpy()
             model(input)
-            _, ax = plt.subplots(1, 2, gridspec_kw={"width_ratios": [15, 10]}, figsize=(25, 6))
-            plt.sca(ax[0])
-            self.plot_prediction()
-            plt.sca(ax[1])
-            self.plot_encoded(true_amp[i], true_time[i])
 
-    def plot_prediction(self) -> None:
-        for label, values in self.activations.items():
-            plot_line(values, label=label)
-        plt.legend()
+            plt.sca(ax[i, 0])
+            for label, values in self.activations.items():
+                plot_line(values, label=label)
+            plt.legend()
 
-    def plot_encoded(self, true_amp: npt.NDArray[float], true_time: np.NDarray[int]) -> None:
+            if compare_truth:
+                if isinstance(compare_truth, str):
+                    compare_truth = [compare_truth]
+                plt.sca(ax[i, 1])
+                self.compare_truth(compare_truth, true_amp[idx], true_time[idx])
+
+    def compare_truth(self, layers: List[str], true_amp: npt.NDArray[float], true_time: npt.NDArray[int]) -> None:
         max_amp = max(true_amp)
-        encoded = self.activations["encoded"]
-        scale = max_amp / encoded.max()
-        plt.plot(encoded * scale, label=f" ($encoded \\times${scale:.01})")
         plt.vlines(true_time, 0, true_amp, color="green", label="truth")
         plt.scatter(true_time[true_amp != 0], true_amp[true_amp != 0], color="green")
+        for name in layers:
+            layer = self.activations[name][0]
+            scale = max_amp / layer.max()
+            plt.plot(layer * scale, label=f" (${name} \\times${scale:.01})")
         plt.legend()
-
-
-# close_time = np.random.choice(np.where(truth[1][:, 1] < 250)[0], 5)
-# far_time = np.random.choice(np.where(truth[1][:, 1] > 500)[0], 5)
-# choices = np.concatenate((close_time, far_time))
